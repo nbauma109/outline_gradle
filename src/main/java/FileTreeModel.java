@@ -35,20 +35,20 @@ public class FileTreeModel extends DefaultTreeModel implements TreeModel {
 		return (DefaultMutableTreeNode) super.getRoot();
 	}
 
-	public List<TreeNode> findNodesWithText(String text) {
+	public List<TreeNode> findNodesMatchingPattern(Pattern pattern) {
 		List<TreeNode> matchingNodes = new ArrayList<>();
-		findNodesWithText(matchingNodes, getRoot(), text);
+		findNodesWithpattern(matchingNodes, getRoot(), pattern);
 		return matchingNodes;
 	}
 
-	private void findNodesWithText(List<TreeNode> matchingNodes, TreeNode node, String text) {
+	private void findNodesWithpattern(List<TreeNode> matchingNodes, TreeNode node, Pattern pattern) {
 		String fileName = ((File) ((DefaultMutableTreeNode) node).getUserObject()).getName();
-		if (Pattern.compile(text).matcher(fileName).find()) {
+		if (pattern.matcher(fileName).find()) {
 			matchingNodes.add(node);
 		}
 		Enumeration<DefaultMutableTreeNode> children = node.children();
 		while (children.hasMoreElements()) {
-			findNodesWithText(matchingNodes, children.nextElement(), text);
+			findNodesWithpattern(matchingNodes, children.nextElement(), pattern);
 		}
 	}
 

@@ -2,6 +2,7 @@ import java.awt.Color;
 import java.io.File;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 import javax.swing.UIManager;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -11,7 +12,7 @@ import org.netbeans.swing.outline.RenderDataProvider;
 
 public class RenderData implements RenderDataProvider {
 
-	private String filter;
+	private String searchPattern;
 	private TreeNode currentMatch;
 
 	@Override
@@ -23,11 +24,11 @@ public class RenderData implements RenderDataProvider {
 	public String getDisplayName(Object o) {
 		DefaultMutableTreeNode node = (DefaultMutableTreeNode) o;
 		String fileName = ((File) node.getUserObject()).getName();
-		if (filter == null || filter.length() == 0) {
+		if (searchPattern == null || searchPattern.length() == 0) {
 			return fileName;
 		}
 		try {
-			Pattern pattern = Pattern.compile("(" + filter + ")");
+			Pattern pattern = Pattern.compile("(" + searchPattern + ")");
 			Matcher matcher = pattern.matcher(fileName);
 			Color bgColor = Color.YELLOW;
 			if (matcher.find()) {
@@ -38,7 +39,7 @@ public class RenderData implements RenderDataProvider {
 			String bgHexColor = Integer.toHexString(bgColor.getRGB() & 0xffffff);
 			String replacement = matcher.replaceAll("<span style=\"background-color: #" + bgHexColor + "\">$1</span>");
 			return "<html>" + replacement + "</html>";
-		} catch (Exception e) {
+		} catch (PatternSyntaxException e) {
 			return fileName;
 		}
 	}
@@ -68,8 +69,8 @@ public class RenderData implements RenderDataProvider {
 		return false;
 	}
 
-	public void setFilter(String filter) {
-		this.filter = filter;
+	public void setSearchPattern(String searchPattern) {
+		this.searchPattern = searchPattern;
 	}
 
 	public void setCurrentMatch(TreeNode currentMatch) {

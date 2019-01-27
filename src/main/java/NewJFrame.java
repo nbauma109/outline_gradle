@@ -2,6 +2,8 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.util.List;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -36,18 +38,18 @@ public class NewJFrame extends JFrame {
 			JScrollPane jScrollPane1 = new JScrollPane(outline);
 			jScrollPane1.setViewportView(outline);
 			JMenuBar mb = new JMenuBar();
-			JLabel filterLabel = new JLabel("  Search :  ");
-			mb.add(filterLabel);
-			JTextField filterTextField = new JTextField();
-			filterLabel.setLabelFor(filterTextField);
-			mb.add(filterTextField);
+			JLabel searchPatternLabel = new JLabel("  Search :  ");
+			mb.add(searchPatternLabel);
+			JTextField searchPatternTextField = new JTextField();
+			searchPatternLabel.setLabelFor(searchPatternTextField);
+			mb.add(searchPatternTextField);
 			setJMenuBar(mb);
 			getContentPane().add(jScrollPane1);
 			pack();
 			setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 			setVisible(true);
 
-			filterTextField.addKeyListener(new KeyAdapter() {
+			searchPatternTextField.addKeyListener(new KeyAdapter() {
 
 				private int nthMatch = 0;
 
@@ -60,18 +62,23 @@ public class NewJFrame extends JFrame {
 							nthMatch++;
 						}
 					}
-					List<TreeNode> matchingNodes = treeMdl.findNodesWithText(filterTextField.getText());
-					if (matchingNodes.size() > 0) {
-						if (nthMatch >= matchingNodes.size()) {
-							nthMatch = 0;
+					try {
+						Pattern searchPattern = Pattern.compile(searchPatternTextField.getText());
+						List<TreeNode> matchingNodes = treeMdl.findNodesMatchingPattern(searchPattern);
+						if (matchingNodes.size() > 0) {
+							if (nthMatch >= matchingNodes.size()) {
+								nthMatch = 0;
+							}
+							TreeNode matchingNode = matchingNodes.get(nthMatch);
+							renderData.setCurrentMatch(matchingNode);
+							TreePath matchingNodePath = new TreePath(((DefaultMutableTreeNode) matchingNode).getPath());
+							outline.expandPath(matchingNodePath);
+							outline.scrollRectToVisible(outline.getPathBounds(matchingNodePath));
+							renderData.setSearchPattern(searchPatternTextField.getText());
 						}
-						TreeNode matchingNode = matchingNodes.get(nthMatch);
-						renderData.setCurrentMatch(matchingNode);
-						TreePath matchingNodePath = new TreePath(((DefaultMutableTreeNode) matchingNode).getPath());
-						outline.expandPath(matchingNodePath);
-						outline.scrollRectToVisible(outline.getPathBounds(matchingNodePath));
-						renderData.setFilter(filterTextField.getText());
-					} 
+					} catch (PatternSyntaxException ex) {
+
+					}
 					outline.repaint();
 				}
 
