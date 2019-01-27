@@ -1,6 +1,7 @@
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.io.File;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
@@ -16,6 +17,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
+import org.netbeans.swing.etable.QuickFilter;
 import org.netbeans.swing.outline.DefaultOutlineModel;
 import org.netbeans.swing.outline.Outline;
 import org.netbeans.swing.outline.OutlineModel;
@@ -42,6 +44,33 @@ public class NewJFrame extends JFrame {
 			mb.add(searchPatternLabel);
 			JTextField searchPatternTextField = new JTextField();
 			searchPatternLabel.setLabelFor(searchPatternTextField);
+			outline.setQuickFilter(0, new QuickFilter() {
+
+				@Override
+				public boolean accept(Object aValue) {
+					if (searchPatternTextField.getText() == null || searchPatternTextField.getText().length() == 0) {
+						return true;
+					}
+					if (aValue instanceof DefaultMutableTreeNode) {
+						DefaultMutableTreeNode node = (DefaultMutableTreeNode) aValue;
+						Enumeration<DefaultMutableTreeNode> children = node.children();
+						while (children.hasMoreElements()) {
+							DefaultMutableTreeNode child = (DefaultMutableTreeNode) children.nextElement();
+							if (accept(child)) {
+								return true;
+							}
+						}
+						try {
+							String fileName = ((File) ((DefaultMutableTreeNode) node).getUserObject()).getName();
+							Pattern searchPattern = Pattern.compile(searchPatternTextField.getText());
+							return searchPattern.matcher(fileName).find();
+						} catch (PatternSyntaxException ex) {
+							return true;
+						}
+					}
+					return false;
+				}
+			});
 			mb.add(searchPatternTextField);
 			setJMenuBar(mb);
 			getContentPane().add(jScrollPane1);

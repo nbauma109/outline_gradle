@@ -36,11 +36,23 @@ public class FileRowModel implements RowModel {
 		case 0:
 			return new Date(f.lastModified());
 		case 1:
-			return new Long(f.length());
+			return computeSize(f);
 		default:
 			assert false;
 		}
 		return null;
+	}
+
+	private Long computeSize(File f) {
+		if (f.isFile()) {
+			return new Long(f.length());
+		}
+		long size = 0;
+		File[] listOfFiles = f.listFiles();
+		for (File file : listOfFiles) {
+			size += computeSize(file);
+		}
+		return size;
 	}
 
 	@Override
