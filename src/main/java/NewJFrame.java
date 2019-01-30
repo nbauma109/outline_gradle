@@ -1,5 +1,7 @@
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.File;
 import java.util.Enumeration;
 import java.util.List;
@@ -13,6 +15,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
+import javax.swing.ToolTipManager;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
@@ -24,8 +27,10 @@ import org.netbeans.swing.outline.OutlineModel;
 
 public class NewJFrame extends JFrame {
 	private static final long serialVersionUID = 1L;
+	private final int defaultDismissTimeout = ToolTipManager.sharedInstance().getDismissDelay();
 
 	public NewJFrame() {
+		javax.swing.ToolTipManager.sharedInstance().setDismissDelay(10000);
 		JFileChooser fileChooser = new JFileChooser(new File(System.getProperty("user.home")));
 		fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 		fileChooser.setAcceptAllFileFilterUsed(false);
@@ -112,6 +117,18 @@ public class NewJFrame extends JFrame {
 				}
 
 			});
+			this.
+			addMouseListener(new MouseAdapter() {
+
+				public void mouseEntered(MouseEvent me) {
+					ToolTipManager.sharedInstance().setDismissDelay(60000);
+				}
+
+				public void mouseExited(MouseEvent me) {
+					ToolTipManager.sharedInstance().setDismissDelay(defaultDismissTimeout);
+				}
+			});
+
 		}
 	}
 

@@ -49,8 +49,10 @@ public class FileRowModel implements RowModel {
 		}
 		long size = 0;
 		File[] listOfFiles = f.listFiles();
-		for (File file : listOfFiles) {
-			size += computeSize(file);
+		if (listOfFiles != null) {
+			for (File file : listOfFiles) {
+				size += computeSize(file);
+			}
 		}
 		return size;
 	}
